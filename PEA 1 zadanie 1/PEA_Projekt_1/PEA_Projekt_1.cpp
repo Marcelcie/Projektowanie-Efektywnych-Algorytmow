@@ -1,20 +1,33 @@
-﻿// PEA_Projekt_1.cpp : Ten plik zawiera funkcję „main”. W nim rozpoczyna się i kończy wykonywanie programu.
-//
+﻿#include <iostream>
+#include <fstream>
+#include <string>
 
-#include <iostream>
+using namespace std;
+
+void matrix_reader(string file) {
+    
+    ifstream plik(file);
+        if (plik.is_open()) {
+            int N;
+            plik >> N;
+            int* matrix = new int[N * N];
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N ; j++) {
+                    plik >> matrix[i * N + j];
+                    cout << matrix[i * N + j] << "\t";
+                }
+                cout << endl;
+            }
+            plik.close();      // Zamykamy plik
+            delete[] matrix;   // Zwalniamy pamięć, aby uniknąć wycieków!
+        }
+        else {
+            cout << "brak wybranego pliku wykonawczego!";
+        }
+
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    matrix_reader("C:\\Users\\ciesl\\source\\repos\\Projektowanie-Efektywnych-Algorytmow\\PEA 1 zadanie 1\\PEA_Projekt_1\\x64\\Release\\tsp_6_2.txt");
 }
-
-// Uruchomienie programu: Ctrl + F5 lub menu Debugowanie > Uruchom bez debugowania
-// Debugowanie programu: F5 lub menu Debugowanie > Rozpocznij debugowanie
-
-// Porady dotyczące rozpoczynania pracy:
-//   1. Użyj okna Eksploratora rozwiązań, aby dodać pliki i zarządzać nimi
-//   2. Użyj okna programu Team Explorer, aby nawiązać połączenie z kontrolą źródła
-//   3. Użyj okna Dane wyjściowe, aby sprawdzić dane wyjściowe kompilacji i inne komunikaty
-//   4. Użyj okna Lista błędów, aby zobaczyć błędy
-//   5. Wybierz pozycję Projekt > Dodaj nowy element, aby utworzyć nowe pliki kodu, lub wybierz pozycję Projekt > Dodaj istniejący element, aby dodać istniejące pliku kodu do projektu
-//   6. Aby w przyszłości ponownie otworzyć ten projekt, przejdź do pozycji Plik > Otwórz > Projekt i wybierz plik sln
