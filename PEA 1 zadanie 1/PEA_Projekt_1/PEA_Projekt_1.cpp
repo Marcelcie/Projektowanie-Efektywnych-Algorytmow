@@ -1,8 +1,10 @@
 ﻿#include <iostream>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 class ATSP {
     //klasa komiwojażer
@@ -109,7 +111,6 @@ int main()
     ATSP problem;
     //deklaracja zmiennych
     int wybor; string sciezka;
-    //koniec deklaracji
 
     do {
         //Interaktywne menu
@@ -134,10 +135,15 @@ int main()
             //C:\\Users\\ciesl\\source\\repos\\Projektowanie-Efektywnych-Algorytmow\\PEA 1 zadanie 1\\PEA_Projekt_1\\x64\\Release\\tsp_6_2.txt -> przykładowy plik do wczytywania.
             problem.Print_Matrix();
             break;
-        case 3:
-            cout << endl;
-            problem.Nearest_Neighbor();
-            break;
+            case 3: {
+                cout << endl;
+                auto start = high_resolution_clock::now();
+                problem.Nearest_Neighbor();
+                auto end = high_resolution_clock::now();
+                duration<double, milli> czas = end - start;
+                cout << "Czas wykonania algorytmu NN: " << czas.count() << " ms\n";
+                break;
+            }
         default:
             cout << "Blad nieprawidlowa liczba!";
         }
