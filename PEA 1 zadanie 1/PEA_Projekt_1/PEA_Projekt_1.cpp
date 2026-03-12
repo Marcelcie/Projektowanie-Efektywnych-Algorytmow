@@ -2,6 +2,10 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <algorithm>
+
 
 using namespace std;
 using namespace std::chrono;
@@ -101,6 +105,58 @@ public:
         delete[] odwiedzone;
 
     }
+    void Random_Search(int iteracje) {
+        if (matrix == nullptr) {
+            cout << "Blad! Macierz jest pusta. Wczytaj najpierw dane z pliku.\n";
+            return;
+        }
+
+        int* obecna_trasa = new int[N];
+        int* najlepsza_trasa = new int[N];
+
+        for (int i = 0; i < N; i++) {
+            obecna_trasa[i] = i;
+            najlepsza_trasa[i] = i;
+        }
+
+        int min_koszt = 9999999;
+        srand(time(NULL));
+
+        for (int k = 0; k < iteracje; k++) {
+
+            // POPRAWIONE TASOWANIE (bez dzielenia przez zero)
+            for (int i = N - 1; i > 1; i--) {
+                int j = 1 + rand() % i;
+                int temp = obecna_trasa[i];
+                obecna_trasa[i] = obecna_trasa[j];
+                obecna_trasa[j] = temp;
+            }
+
+            // POPRAWIONE LICZENIE KOSZTU (bez wychodzenia za tablice)
+            int aktualny_koszt = 0;
+            for (int i = 0; i < N - 1; i++) {
+                aktualny_koszt += matrix[obecna_trasa[i] * N + obecna_trasa[i + 1]];
+            }
+            aktualny_koszt += matrix[obecna_trasa[N - 1] * N + obecna_trasa[0]];
+
+            if (aktualny_koszt < min_koszt) {
+                min_koszt = aktualny_koszt;
+                for (int i = 0; i < N; i++) {
+                    najlepsza_trasa[i] = obecna_trasa[i];
+                }
+            }
+        }
+
+        cout << "\n--- TRASA (Algorytm Losowy - " << iteracje << " prob) ---\n";
+        for (int i = 0; i < N; i++) {
+            cout << najlepsza_trasa[i] << " -> ";
+        }
+        cout << najlepsza_trasa[0] << "\n";
+        cout << "Calkowity koszt: " << min_koszt << "\n";
+
+        delete[] obecna_trasa;
+        delete[] najlepsza_trasa;
+    }
 };
 
 
@@ -118,6 +174,7 @@ int main()
         cout << "1. Wczytaj macierz z pliku" << endl;
         cout << "2. Wyswietl macierz" << endl;
         cout << "3. Wyswietlanie marcierzy NN" << endl;
+		cout << "4. Wyswietlanie marcierzy Losowy" << endl;
         // ... dopisz reszte opcji (NN, Brute-Force, itp.)
         cout << "0. Wyjscie" << endl;
         cout << "Wybierz opcje: ";
@@ -135,15 +192,28 @@ int main()
             //C:\\Users\\ciesl\\source\\repos\\Projektowanie-Efektywnych-Algorytmow\\PEA 1 zadanie 1\\PEA_Projekt_1\\x64\\Release\\tsp_6_2.txt -> przykładowy plik do wczytywania.
             problem.Print_Matrix();
             break;
-            case 3: {
-                cout << endl;
-                auto start = high_resolution_clock::now();
-                problem.Nearest_Neighbor();
-                auto end = high_resolution_clock::now();
-                duration<double, milli> czas = end - start;
-                cout << "Czas wykonania algorytmu NN: " << czas.count() << " ms\n";
-                break;
+        case 3: {
+            cout << endl;
+            auto start = high_resolution_clock::now();
+            problem.Nearest_Neighbor();
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+            cout << "Czas wykonania algorytmu NN: " << czas.count() << " ms\n";
+            break;
             }
+        case 4: {
+            int liczba_prob = 0;
+            cout << "Podaj ilosc permutacji, ktore chcesz wykonac: ";
+            cin >> liczba_prob;
+
+            auto start = high_resolution_clock::now();
+            problem.Random_Search(liczba_prob);
+            auto end = high_resolution_clock::now();
+
+            duration<double, milli> czas = end - start;
+            cout << "Czas wykonania algorytmu Losowego: " << czas.count() << " ms\n";
+            break;
+        }
         default:
             cout << "Blad nieprawidlowa liczba!";
         }
