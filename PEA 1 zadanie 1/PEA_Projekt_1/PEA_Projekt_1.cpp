@@ -60,7 +60,42 @@ public:
             cout << endl;
         }
     }
-    void Nearest_Neighbor() {
+    void Automat(int Rozmiar_macierzy,int Ilosc_testow){
+		int suma_kosztow = 0;
+		double suma_czasow = 0.0;
+        for (int i = 0; i < Ilosc_testow;i++) {
+            Generate_Matrix(Rozmiar_macierzy);
+            auto start = high_resolution_clock::now();
+            int wynik = Nearest_Neighbor(false);
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+            suma_czasow += czas.count();
+            suma_kosztow += wynik;
+        }
+        cout << "\n=== WYNIKI TESTOW (N=" << Rozmiar_macierzy << ", powtorzen: " << Ilosc_testow << ") ===" << endl;
+        cout << "Sredni czas: " << suma_czasow / Ilosc_testow << " ms" << endl;
+        cout << "Sredni koszt: " << suma_kosztow / Ilosc_testow << endl;
+
+    }
+    void Generate_Matrix(int Rozmiar_macierzy) {
+        if (matrix != nullptr) {
+            delete[] matrix;
+        }
+        N = Rozmiar_macierzy;
+        matrix = new int[N * N];
+        srand(time(NULL));
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (i == j) {
+                    matrix[i * N + j] = -1; // Brak przejścia do samego siebie
+                }
+                else {
+                    matrix[i * N + j] = rand() % 100 + 1; // Losowy koszt między 1 a 100
+                }
+            }
+        }
+	}
+    int Nearest_Neighbor(bool pokaz_trase = true) {
         if (matrix == nullptr) {
             cout << "Blad! Macierz jest pusta. Wczytaj najpierw dane z pliku.\n";
             return;
@@ -68,14 +103,16 @@ public:
         bool* odwiedzone = new bool[N];
         for (int i = 0; i < N; i++) {
             odwiedzone[i] = false;
+            return -1;
         }
         int aktualne_miasto = 0;
         odwiedzone[aktualne_miasto] = true;
         int calkowity_koszt = 0;
 
-        cout << "\n--- TRASA (NN) ---\n";
-        cout << aktualne_miasto;
-
+        if (pokaz_trase) {
+            cout << "\n--- TRASA (NN) ---\n";
+            cout << aktualne_miasto;
+        }
 
         for (int krok = 1; krok < N; krok++) {
             int najblizsze_miasto = -1;
@@ -103,12 +140,13 @@ public:
 
 
         delete[] odwiedzone;
+		return calkowity_koszt;
 
     }
-    void Random_Search(int iteracje) {
+    int Random_Search(int iteracje, bool pokaz_trase = true) {
         if (matrix == nullptr) {
-            cout << "Blad! Macierz jest pusta. Wczytaj najpierw dane z pliku.\n";
-            return;
+            if (pokaz_trase) cout << "Blad! Macierz jest pusta. Wczytaj najpierw dane z pliku.\n";
+            return -1;
         }
 
         int* obecna_trasa = new int[N];
@@ -145,6 +183,7 @@ public:
                     najlepsza_trasa[i] = obecna_trasa[i];
                 }
             }
+			return min_koszt;
         }
 
         cout << "\n--- TRASA (Algorytm Losowy - " << iteracje << " prob) ---\n";
@@ -173,8 +212,9 @@ int main()
         cout << "\n=== MENU GLOWNE ===" << endl;
         cout << "1. Wczytaj macierz z pliku" << endl;
         cout << "2. Wyswietl macierz" << endl;
-        cout << "3. Wyswietlanie marcierzy NN" << endl;
-		cout << "4. Wyswietlanie marcierzy Losowy" << endl;
+        cout << "3. Generowanie Losowych macierzy" << endl;
+        cout << "4. Wyswietlanie marcierzy NN" << endl;
+		cout << "5. Wyswietlanie marcierzy Losowy" << endl;
         // ... dopisz reszte opcji (NN, Brute-Force, itp.)
         cout << "0. Wyjscie" << endl;
         cout << "Wybierz opcje: ";
@@ -182,36 +222,47 @@ int main()
         switch (wybor) {
         case 1:
             cout << "Podaj sciezke do swojego pliku .txt: \n";
-            cin.ignore();          // Czyścimy bufor z Entera po 'cin >> wybor'
-            getline(cin, sciezka); // Pobieramy pełną ścieżkę ze spacjami
             problem.matrix_reader(sciezka);
             cout << "Wczytano sciezke do pamieci programu." << endl;
             break;
         case 2:
             cout << endl;
-            //C:\\Users\\ciesl\\source\\repos\\Projektowanie-Efektywnych-Algorytmow\\PEA 1 zadanie 1\\PEA_Projekt_1\\x64\\Release\\tsp_6_2.txt -> przykładowy plik do wczytywania.
             problem.Print_Matrix();
             break;
-        case 3: {
+
+        case 3:
+            int rozmiar, ilosc_testow;
+            cout << "Podaj rozmiar macierzy: ";
+            cin >> rozmiar;
+            cout << "Podaj ilosc testow: ";
+            cin >> ilosc_testow;
+            problem.Automat(rozmiar, ilosc_testow);
+			break;
+
+        case 4: {
             cout << endl;
             auto start = high_resolution_clock::now();
-            problem.Nearest_Neighbor();
+            int koszt = problem.Nearest_Neighbor();
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - start;
-            cout << "Czas wykonania algorytmu NN: " << czas.count() << " ms\n";
+            if (koszt != -1) {
+                cout << "Czas wykonania algorytmu NN: " << czas.count() << " ms\n";
+            }
             break;
             }
-        case 4: {
+
+        case 5: {
             int liczba_prob = 0;
             cout << "Podaj ilosc permutacji, ktore chcesz wykonac: ";
             cin >> liczba_prob;
 
             auto start = high_resolution_clock::now();
-            problem.Random_Search(liczba_prob);
+            int koszt = problem.Random_Search(liczba_prob);
             auto end = high_resolution_clock::now();
-
             duration<double, milli> czas = end - start;
-            cout << "Czas wykonania algorytmu Losowego: " << czas.count() << " ms\n";
+			if (koszt != -1) {
+               cout << "Czas wykonania algorytmu Losowego: " << czas.count() << " ms\n";
+            }
             break;
         }
         default:
