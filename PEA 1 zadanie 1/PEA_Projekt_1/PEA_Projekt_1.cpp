@@ -64,6 +64,7 @@ public:
         double suma_czasow_NN = 0.0, suma_bledu_NN = 0.0;
         double suma_czasow_RS = 0.0, suma_bledu_RS = 0.0;
 		double suma_czasow_RNN = 0.0, suma_bledu_RNN = 0.0;
+		double suma_czasow_BF = 0.0;
         int liczba_prob_RS = 1000;
 
         for (int i = 0; i < Ilosc_testow; i++) {
@@ -78,6 +79,16 @@ public:
             duration<double, milli> czas_NN = end_NN - start_NN;
             suma_czasow_NN += czas_NN.count();
             suma_bledu_NN += ((double)koszt_NN - koszt_idealny) / koszt_idealny * 100.0;
+
+
+			// --- TEST BF ---
+			auto start_BF = high_resolution_clock::now();
+			int koszt_BF = Brute_Force(false);
+			auto end_BF = high_resolution_clock::now();
+
+			duration<double, milli> czas_BF = end_BF - start_BF;
+			suma_czasow_BF += czas_BF.count();
+
 
             // --- TEST RANDOM SEARCH ---
             auto start_RS = high_resolution_clock::now();
@@ -106,9 +117,11 @@ public:
         double sr_b_RS = suma_bledu_RS / Ilosc_testow;
 		double sr_c_RNN = suma_czasow_RNN / Ilosc_testow;
 		double sr_b_RNN = suma_bledu_RNN / Ilosc_testow;
+		double sr_c_BF = suma_czasow_BF / Ilosc_testow;
 
         // Wyświetlanie w konsoli
         cout << "\n--- WYNIKI (N=" << Rozmiar_macierzy << ", Proby=" << Ilosc_testow << ") ---" << endl;
+		cout << "BF | Czas: " << sr_c_BF << "ms | Blad: 0 %" << endl;
         cout << "NN | Czas: " << sr_c_NN << "ms | Blad: " << sr_b_NN << "%" << endl;
         cout << "RS | Czas: " << sr_c_RS << "ms | Blad: " << sr_b_RS << "%" << endl;
 		cout << "RNN | Czas: " << sr_c_RNN << "ms | Blad: " << sr_b_RNN << "%" << endl;
@@ -122,6 +135,7 @@ public:
                 plik << "N;Algorytm;Sredni_Czas_ms;Sredni_Blad_procent\n";
             }
             // Dane
+			plik << Rozmiar_macierzy << ";BF;" << sr_c_BF << ";0\n";
             plik << Rozmiar_macierzy << ";NN;" << sr_c_NN << ";" << sr_b_NN << "\n";
             plik << Rozmiar_macierzy << ";RS;" << sr_c_RS << ";" << sr_b_RS << "\n";
 			plik << Rozmiar_macierzy << ";RNN;" << sr_c_RNN << ";" << sr_b_RNN << "\n";
@@ -312,7 +326,7 @@ int main()
     //Inicjalizacja Obiektu w programie
     ATSP problem;
     //deklaracja zmiennych
-    string sciezka; int wybor, n_rozmiar, n_powtorzen, liczba_prob, rozmiar,ilosc_testow;
+    string sciezka; int wybor, n_rozmiar, n_powtorzen, liczba_prob;
 
     do {
         //Interaktywne menu
@@ -320,70 +334,71 @@ int main()
         cout << "1. Wczytaj macierz z pliku" << endl;
         cout << "2. Wyswietl macierz" << endl;
         cout << "3. Generowanie Losowych macierzy" << endl;
-        cout << "4. Wyswietlanie trasy NN" << endl;
-        cout << "5. Wyswietlanie trasy Losowy" << endl;
-        cout << "6. Wyswietlanie trasy Brute-Force" << endl;
-        cout << "7. Automat testowy (Porownanie: BF, NN, RS, RNN)" << endl;
-		cout << "8. Wyswietlanie trasy RNN" << endl;
+        cout << "4. Automat testowy (Porownanie: BF, NN, RS, RNN)" << endl;
+        cout << "5. Wyswietlanie trasy NN" << endl;
+        cout << "6. Wyswietlanie trasy Losowy (RS)" << endl;
+        cout << "7. Wyswietlanie trasy Brute-Force" << endl;
+        cout << "8. Wyswietlanie trasy RNN" << endl;
         cout << "0. Wyjscie" << endl;
         cout << "Wybierz opcje: ";
         cin >> wybor;
-        
+
         switch (wybor) {
-		case 1: // wczytywanie macierzy z pliku
+        case 1: // wczytywanie macierzy z pliku
             cout << "Podaj sciezke do pliku .txt: ";
             cin >> sciezka;
             problem.matrix_reader(sciezka);
             cout << "Pomyslnie zaladowano plik: " << sciezka << endl;
             break;
 
-		case 2: //Wyswietlanie macierzy
+        case 2: //Wyswietlanie macierzy
             problem.Print_Matrix();
             break;
 
-		case 3: //Generowanie losowych macierzy
+        case 3: //Generowanie losowych macierzy
             cout << "Podaj rozmiar macierzy: ";
             cin >> n_rozmiar;
             problem.Generate_Matrix(n_rozmiar);
             cout << "Wygenerowano macierz " << n_rozmiar << "x" << n_rozmiar << endl;
             break;
 
-        case 4: { //NN
-            auto start = high_resolution_clock::now();
-            int koszt = problem.Nearest_Neighbor(true);
-            auto end = high_resolution_clock::now();
-            duration<double, milli> czas = end - start;
-            if (koszt != -1) cout << "Czas: " << czas.count() << " ms" << endl;
-            break;
-        }
-
-        case 5: { //Losowy
-            cout << "Podaj ilosc prob: ";
-            cin >> liczba_prob;
-            auto start = high_resolution_clock::now();
-            int koszt = problem.Random_Search(liczba_prob, true);
-            auto end = high_resolution_clock::now();
-            duration<double, milli> czas = end - start;
-            if (koszt != -1) cout << "Czas: " << czas.count() << " ms" << endl;
-            break;
-        }
-
-		case 6: { //Brute-Force
-            auto start = high_resolution_clock::now();
-            int koszt = problem.Brute_Force(true);
-            auto end = high_resolution_clock::now();
-            duration<double, milli> czas = end - start;
-            if (koszt != -1) cout << "Czas: " << czas.count() << " ms" << endl;
-            break;
-        }
-
-		case 7: { //Automat testowy
+        case 4: { //Automat testowy
             cout << "--- AUTOMAT TESTOWY ---" << endl;
             cout << "Rozmiar (N): "; cin >> n_rozmiar;
             cout << "Powtorzenia: "; cin >> n_powtorzen;
             problem.Automat(n_rozmiar, n_powtorzen);
             break;
         }
+
+        case 5: { //NN
+            auto start = high_resolution_clock::now();
+            int koszt = problem.Nearest_Neighbor(true);
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+            if (koszt != -1) cout << "Czas NN: " << czas.count() << " ms" << endl;
+            break;
+        }
+
+        case 6: { //Losowy
+            cout << "Podaj ilosc prob: ";
+            cin >> liczba_prob;
+            auto start = high_resolution_clock::now();
+            int koszt = problem.Random_Search(liczba_prob, true);
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+            if (koszt != -1) cout << "Czas RS: " << czas.count() << " ms" << endl;
+            break;
+        }
+
+        case 7: { //Brute-Force
+            auto start = high_resolution_clock::now();
+            int koszt = problem.Brute_Force(true);
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+            if (koszt != -1) cout << "Czas BF: " << czas.count() << " ms" << endl;
+            break;
+        }
+
         case 8: {//RNN
             auto start = high_resolution_clock::now();
             int koszt = problem.Repetitive_Nearest_Neighbor(true);
@@ -398,7 +413,7 @@ int main()
             break;
 
         default:
-            cout << "Blad nieprawidlowa liczba!";
+            cout << "Blad nieprawidlowa opcja!" << endl;
         }
     } while (wybor != 0);
     return 0;
