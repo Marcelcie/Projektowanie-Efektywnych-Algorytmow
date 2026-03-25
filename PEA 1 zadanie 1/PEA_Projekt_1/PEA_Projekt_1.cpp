@@ -180,7 +180,7 @@ public:
 
         for (int krok = 1; krok < N; krok++) {
             int najblizsze_miasto = -1;
-            int min_koszt = 9999999;
+            int min_koszt = INT_MAX;
 
             // SZUKANIE NAJBLIZSZEGO SASIADA
             for (int sasiad = 0; sasiad < N; sasiad++) {
@@ -227,7 +227,7 @@ public:
             najlepsza_trasa[i] = i;
         }
 
-        int min_koszt = 9999999;
+        int min_koszt = INT_MAX;
         srand(time(NULL));
 
         for (int k = 0; k < iteracje; k++) {
@@ -275,7 +275,7 @@ public:
         for (int i = 0; i < N; i++) {
             trasa[i] = i;
         }
-        int min_koszt = 9999999;
+        int min_koszt = INT_MAX;
         do {
             int aktualny_koszt = 0;
             for (int i = 0; i < N - 1; i++) {
@@ -300,7 +300,7 @@ public:
     int Repetitive_Nearest_Neighbor(bool pokaz_trase = true) {
         if (matrix == nullptr) return -1;
 
-        int najlepszy_koszt = 9999999;
+        int najlepszy_koszt = INT_MAX;
 
         for (int i = 0; i < N; i++) {
             // Wywołujemy NN dla każdego miasta startowego bez śmiecenia w konsoli

@@ -1,0 +1,11 @@
+﻿  PEA_Projekt_1.cpp
+C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(152,19): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
+C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(231,19): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
+C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(329,69): warning C4101: "rozmiar": lokalna zmienna, do której nie istnieje odwołanie
+C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(329,77): warning C4101: "ilosc_testow": lokalna zmienna, do której nie istnieje odwołanie
+  Trwa generowanie kodu
+  1 of 218 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Zakończono generowanie kodu
+  PEA_Projekt_1.vcxproj -> C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\x64\Release\PEA_Projekt_1.exe
