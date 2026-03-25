@@ -301,6 +301,43 @@ public:
         delete[] trasa;
 		return min_koszt;
     }
+    void RNN_Branch(int obecny, int start, int odwiedzonych, int koszt_aktualny, bool* odwiedzone, int& najlepszy_koszt) {
+        // 1. Sprawdzamy czy odwiedzono wszystkie miasta i czy mozna wrocic do startu
+        if (odwiedzonych == N) {
+            int koszt_powrotu = matrix[obecny * N + start];
+            if (koszt_powrotu != -1) {
+                int calkowity = koszt_aktualny + koszt_powrotu;
+                if (calkowity < najlepszy_koszt) {
+                    najlepszy_koszt = calkowity;
+                }
+            }
+            return;
+        }
+
+        // 2. Szukamy najmniejszej krawedzi do dostepnego sasiada
+        int min_waga = INT_MAX;
+        for (int i = 0; i < N; i++) {
+            int waga = matrix[obecny * N + i];
+            if (!odwiedzone[i] && waga != -1 && waga < min_waga) {
+                min_waga = waga;
+            }
+        }
+
+        if (min_waga == INT_MAX) return; // Slepy zaulek
+
+        // 3. Wchodzimy we wszystkie galezie, ktore maja koszt rowny min_waga
+        for (int i = 0; i < N; i++) {
+            int waga = matrix[obecny * N + i];
+            if (!odwiedzone[i] && waga == min_waga) {
+                odwiedzone[i] = true;
+
+                // Rekurencja
+                RNN_Branch(i, start, odwiedzonych + 1, koszt_aktualny + min_waga, odwiedzone, najlepszy_koszt);
+
+                odwiedzone[i] = false; // Cofamy sie, by sprawdzic kolejne miasto
+            }
+        }
+    }
     int Repetitive_Nearest_Neighbor(bool pokaz_trase = true) {
         if (matrix == nullptr) return -1;
 
