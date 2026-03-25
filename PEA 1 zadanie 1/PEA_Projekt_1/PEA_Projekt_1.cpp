@@ -1,4 +1,8 @@
-﻿#include <iostream>
+﻿
+// Marcel Cieslinski, 280871
+// Projekt nr 1 - ATSP (BF, NN, RNN, RS)
+
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <chrono>
