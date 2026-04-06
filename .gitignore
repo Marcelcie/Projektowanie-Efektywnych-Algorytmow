@@ -1,6 +1,28 @@
-﻿################################################################################
-# Ten plik .gitignore został utworzony automatycznie przez Microsoft(R) Visual Studio.
+################################################################################
+# Standardowy .gitignore dla C++ i Visual Studio
 ################################################################################
 
-/.vs
-/PEA 1 zadanie 1/PEA_Projekt_1/.vs/PEA_Projekt_1.slnx
+# Foldery konfiguracyjne i cache Visual Studio
+.vs/
+*.ipch
+*.opendb
+*.db
+*.vc.db
+*.vc.VC.opendb
+
+# Prywatne pliki ustawień użytkownika (żeby nie nadpisywać ustawień prowadzącego)
+*.user
+*.userosscache
+*.sln.docstates
+
+# Wyniki kompilacji (nie wrzucamy na GitHuba plików wykonywalnych i obiektowych)
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Oo]bj/
+[Bb]in/
+
+# Ukryte pliki systemowe
+.DS_Store
+Thumbs.db
