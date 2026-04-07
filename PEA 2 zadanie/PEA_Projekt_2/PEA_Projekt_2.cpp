@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <chrono>
 #include <vector>
+#include "algorytmy.h"
 
 using namespace std;
 
