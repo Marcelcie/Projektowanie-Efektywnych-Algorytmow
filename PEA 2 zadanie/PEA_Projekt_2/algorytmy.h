@@ -136,7 +136,7 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, int initial_upper
 
         auto current_time = chrono::high_resolution_clock::now();
         if (chrono::duration_cast<chrono::seconds>(current_time - start_time).count() > 300) {
-            cout << "\n[TIMEOUT] Przekroczono limit 5 minut! Przerwano obliczenia.\n";
+            cout << "\nPrzekroczono limit 5 minut!.\n";
             return minTourCost;
         }
 

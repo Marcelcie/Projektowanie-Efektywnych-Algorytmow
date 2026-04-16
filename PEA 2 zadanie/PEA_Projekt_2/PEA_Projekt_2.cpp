@@ -55,7 +55,7 @@ void DisplayMatrix() {
     }
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
-            cout << Matrix[i][j] << "/t";
+            cout << Matrix[i][j] << "\t";
         }
         cout << endl;
     }
@@ -97,7 +97,61 @@ int main()
         cout << "Wybierz opcje: ";
         cin >> wybor;
 
+        switch (wybor) {
+        case 1:
+            cout << "Podaj scieszke do pliku: ";
+            cin >> scieszka;
+			problem.readMatrixFromFile(scieszka);
+            break;
+        case 2:
+            problem.DisplayMatrix();
+			break;
+        case 3:
+            cout << "Podaj rozmiar macierzy: ";
+            cin >> n_rozmiar;
+			problem.Generate_Matrix(n_rozmiar);
+            break;
+        case 4: {
+            vector<vector<int>> macierz = problem.getMatrix();
+            if (macierz.empty()) {
+                cout << "Macierz jest pusta. Wczytaj dane z pliku " << endl;
+                break;
+            }
+            auto stary = high_resolution_clock::now();
+            int koszt = SolveTSP(macierz);
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - stary;
+            cout << "Najlepszy koszt trasy: " << koszt << endl;
+            cout << "Czas wykonania: " << czas.count() << " ms" << endl;
+            break;
+        }
+        case 5: {
+            vector<vector<int>> macierz = problem.getMatrix();
+            if (macierz.empty()) {
+                cout << "Blad! Macierz jest pusta. Wczytaj dane z pliku lub wygeneruj.\n";
+                break;
+            }
 
+            cout << "\n[ Trwaja obliczenia - Breadth-First Search... ]\n";
+            auto start = high_resolution_clock::now();
+
+            // CZYSTE LICZENIE BEZ COUT'OW
+            int koszt = SolveTSPBreadth(macierz);
+
+            auto end = high_resolution_clock::now();
+            duration<double, milli> czas = end - start;
+
+            cout << "Znalazlem najtansza trase! Koszt: " << koszt << "\n";
+            cout << "Czas dzialania algorytmu: " << czas.count() << " ms\n";
+            break;
+        }
+        case 0:
+            cout << "Zamykanie programu..." << endl;
+            break;
+
+        default:
+            cout << "Blad! Nieprawidlowa opcja." << endl;
+        }
 
 	} while (wybor != 0);
 
