@@ -1,12 +1,106 @@
-﻿#include <iostream>
+﻿//projekt 2 
+// autor: Marcel Cieśliński nr.albumu 280871
+
+#include <iostream>
 #include <chrono>
 #include <vector>
+#include <fstream>
 #include "algorytmy.h"
 
 using namespace std;
+using namespace std::chrono;
+
+class ATSP {
+private:
+    vector<vector<int>> Matrix;
+    int N;
+public:
+    //konstruktor
+    ATSP() {
+        N = 0;
+    }
+	//destruktor
+    ~ATSP() {}
+
+    vector<vector<int>>getMatrix() {
+        return Matrix;
+    }
+
+
+
+void readMatrixFromFile(string file) {
+    ifstream plik(file);
+    if (plik.is_open()) {
+        plik >> N;
+
+        //Przygotowanie macierzy NxN
+        Matrix.assign(N, vector<int>(N));
+
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                plik >> Matrix[i][j];
+            }
+        }
+        plik.close();
+		cout << "Macierz o rozmiarze:" << N << "x" << N << "została wczytana pomyślnie." << endl;
+    }
+    else {
+		cout << "Nie można otworzyć pliku: " << file << endl;
+    }
+}
+void DisplayMatrix() {
+    if (Matrix.empty()) {
+        cout << "Macierz jest pusta. Wczytaj dane z pliku." << endl;
+        return;
+    }
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            cout << Matrix[i][j] << "/t";
+        }
+        cout << endl;
+    }
+}
+void Generate_Matrix(int rozmiar_macierzy) {
+	N = rozmiar_macierzy;
+	Matrix.assign(N, vector<int>(N));
+	srand(time(NULL)); // Inicjalizacja generatora liczb losowych
+
+    for (int i = 0; i < N; ++i){
+        for (int j = 0; j < N; ++j) {
+            if (i == j) {
+				Matrix[i][j] = -1; // Brak przejścia do samego siebie
+            }
+            else {
+				Matrix[i][j] = rand() % 100 + 1; // Losowa waga krawędzi (1-100)    
+            }
+        }
+    }
+	cout << "Wygenerowano macierz o rozmiarze:" << N << "x" << N << "." << endl;
+}
+};
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    //inicjacja obiektu w projekcie
+    ATSP problem;
+    string scieszka;
+    int wybor, n_rozmiar;
+
+    do {
+        cout << "\n=== MENU GLOWNE (Projekt 2 - Branch & Bound) ===" << endl;
+        cout << "1. Wczytaj macierz z pliku" << endl;
+        cout << "2. Wyswietl macierz" << endl;
+        cout << "3. Generowanie Losowych macierzy" << endl;
+        cout << "4. Uruchom B&B (Best-First / Kopiec) - na 3.0" << endl;
+        cout << "5. Uruchom B&B (Breadth-First / Kolejka) - na 4.0" << endl;
+        cout << "0. Wyjscie" << endl;
+        cout << "Wybierz opcje: ";
+        cin >> wybor;
+
+
+
+	} while (wybor != 0);
+
+    return 0;
 }
 
