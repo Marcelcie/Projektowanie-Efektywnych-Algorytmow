@@ -18,6 +18,7 @@ public:
     //konstruktor
     ATSP() {
         N = 0;
+        srand(time(NULL)); // Inicjalizacja generatora liczb losowych
     }
 	//destruktor
     ~ATSP() {}
@@ -63,8 +64,6 @@ void DisplayMatrix() {
 void Generate_Matrix(int rozmiar_macierzy) {
 	N = rozmiar_macierzy;
 	Matrix.assign(N, vector<int>(N));
-	srand(time(NULL)); // Inicjalizacja generatora liczb losowych
-
     for (int i = 0; i < N; ++i){
         for (int j = 0; j < N; ++j) {
             if (i == j) {
@@ -76,6 +75,81 @@ void Generate_Matrix(int rozmiar_macierzy) {
         }
     }
 	cout << "Wygenerowano macierz o rozmiarze:" << N << "x" << N << "." << endl;
+}
+// Szybki algorytm zachłanny, żeby dać nam "dobry" początkowy budżet
+int ObliczPoczatkowyKoszt() {
+    int koszt = 0;
+    vector<bool> odwiedzone(N, false);
+    int obecne = 0;
+    odwiedzone[0] = true;
+
+    for (int krok = 0; krok < N - 1; ++krok) {
+        int najtansze = INT_MAX;
+        int nastepne = -1;
+        for (int i = 0; i < N; ++i) {
+            if (!odwiedzone[i] && Matrix[obecne][i] != -1 && Matrix[obecne][i] < najtansze) {
+                najtansze = Matrix[obecne][i];
+                nastepne = i;
+            }
+        }
+        koszt += najtansze;
+        odwiedzone[nastepne] = true;
+        obecne = nastepne;
+    }
+    koszt += Matrix[obecne][0]; // powrót do startu
+    return koszt;
+}
+void Automat_BB(int poczatkowe_N, int koncowe_N, int ilosc_prob) {
+    ofstream plik("wyniki_bb.csv", ios::app);
+    if (!plik.is_open()) {
+        cout << "Blad otwarcia pliku CSV!" << endl;
+        return;
+    }
+
+    // Dodajemy nagłówek, jeśli plik jest pusty
+    plik.seekp(0, ios::end);
+    if (plik.tellp() == 0) {
+        plik << "N;Metoda;Sredni_Czas_ms\n";
+    }
+
+    cout << "\n--- ROZPOCZECIE TESTOW AUTOMATYCZNYCH ---\n";
+
+    for (int n = poczatkowe_N; n <= koncowe_N; n++) {
+        double suma_czasow_kopiec = 0.0;
+        double suma_czasow_kolejka = 0.0;
+
+        for (int p = 0; p < ilosc_prob; p++) {
+            Generate_Matrix(n);
+
+            // --- NOWE: LICZYMY BUDZET STARTOWY ---
+            int bezpieczny_budzet = ObliczPoczatkowyKoszt();
+
+            // --- TEST BEST-FIRST (Kopiec) ---
+            auto start_kopiec = high_resolution_clock::now();
+            SolveTSP(Matrix, bezpieczny_budzet); // <-- Przekazujemy budżet!
+            auto end_kopiec = high_resolution_clock::now();
+            suma_czasow_kopiec += duration<double, milli>(end_kopiec - start_kopiec).count();
+
+            // --- TEST BREADTH-FIRST (Kolejka FIFO) ---
+            auto start_kolejka = high_resolution_clock::now();
+            SolveTSPBreadth(Matrix, bezpieczny_budzet); // <-- Przekazujemy budżet!
+            auto end_kolejka = high_resolution_clock::now();
+            suma_czasow_kolejka += duration<double, milli>(end_kolejka - start_kolejka).count();
+        }
+
+        // Uśredniamy wyniki
+        double sr_czas_kopiec = suma_czasow_kopiec / ilosc_prob;
+        double sr_czas_kolejka = suma_czasow_kolejka / ilosc_prob;
+
+        // Zapis do pliku CSV
+        plik << n << ";Best-First(Kopiec);" << sr_czas_kopiec << "\n";
+        plik << n << ";Breadth-First(Kolejka);" << sr_czas_kolejka << "\n";
+
+        cout << "Przetestowano N=" << n << " | Kopiec: " << sr_czas_kopiec << " ms | Kolejka: " << sr_czas_kolejka << " ms\n";
+    }
+
+    plik.close();
+    cout << "--- ZAKONCZONO! Wyniki zapisano w pliku wyniki_bb.csv ---\n";
 }
 };
 
@@ -93,6 +167,7 @@ int main()
         cout << "3. Generowanie Losowych macierzy" << endl;
         cout << "4. Uruchom B&B (Best-First / Kopiec) - na 3.0" << endl;
         cout << "5. Uruchom B&B (Breadth-First / Kolejka) - na 4.0" << endl;
+		cout << "6. Uruchom Automatyczne Testy B&B (Best-First vs Breadth-First)" << endl;
         cout << "0. Wyjscie" << endl;
         cout << "Wybierz opcje: ";
         cin >> wybor;
@@ -117,8 +192,9 @@ int main()
                 cout << "Macierz jest pusta. Wczytaj dane z pliku " << endl;
                 break;
             }
+            int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
             auto stary = high_resolution_clock::now();
-            int koszt = SolveTSP(macierz);
+            int koszt = SolveTSP(macierz, bezpieczny_budzet);
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - stary;
             cout << "Najlepszy koszt trasy: " << koszt << endl;
@@ -133,10 +209,10 @@ int main()
             }
 
             cout << "\n[ Trwaja obliczenia - Breadth-First Search... ]\n";
+            int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
             auto start = high_resolution_clock::now();
-
             // CZYSTE LICZENIE BEZ COUT'OW
-            int koszt = SolveTSPBreadth(macierz);
+            int koszt = SolveTSPBreadth(macierz, bezpieczny_budzet);
 
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - start;
@@ -144,6 +220,17 @@ int main()
             cout << "Znalazlem najtansza trase! Koszt: " << koszt << "\n";
             cout << "Czas dzialania algorytmu: " << czas.count() << " ms\n";
             break;
+        }
+        case 6:{
+                  int start_n, end_n, proby;
+                  cout << "Podaj poczatkowy rozmiar N: ";
+                  cin >> start_n;
+                  cout << "Podaj koncowy rozmiar N: ";
+                  cin >> end_n;
+                  cout << "Podaj ilosc prob dla kazdego N: ";
+                  cin >> proby;
+                  problem.Automat_BB(start_n, end_n, proby);
+                  break;
         }
         case 0:
             cout << "Zamykanie programu..." << endl;
