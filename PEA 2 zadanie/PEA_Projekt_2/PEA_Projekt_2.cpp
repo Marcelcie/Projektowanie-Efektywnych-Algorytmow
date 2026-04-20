@@ -43,10 +43,10 @@ void readMatrixFromFile(string file) {
             }
         }
         plik.close();
-		cout << "Macierz o rozmiarze:" << N << "x" << N << "została wczytana pomyślnie." << endl;
+		cout << "Macierz o rozmiarze: " << N << "x" << N << " zostala wczytana pomyslnie." << endl;
     }
     else {
-		cout << "Nie można otworzyć pliku: " << file << endl;
+		cout << "Nie można otworzyc pliku: " << file << endl;
     }
 }
 void DisplayMatrix() {
@@ -121,18 +121,21 @@ void Automat_BB(int poczatkowe_N, int koncowe_N, int ilosc_prob) {
         for (int p = 0; p < ilosc_prob; p++) {
             Generate_Matrix(n);
 
+            // Atrapa ścieżki dla automatu (bo mierzymy tylko czas)
+            vector<int> dummy_path;
+
             // --- NOWE: LICZYMY BUDZET STARTOWY ---
             int bezpieczny_budzet = ObliczPoczatkowyKoszt();
 
             // --- TEST BEST-FIRST (Kopiec) ---
             auto start_kopiec = high_resolution_clock::now();
-            SolveTSP(Matrix, bezpieczny_budzet); // <-- Przekazujemy budżet!
+            SolveTSP(Matrix,dummy_path, bezpieczny_budzet); // <-- Przekazujemy budżet!
             auto end_kopiec = high_resolution_clock::now();
             suma_czasow_kopiec += duration<double, milli>(end_kopiec - start_kopiec).count();
 
             // --- TEST BREADTH-FIRST (Kolejka FIFO) ---
             auto start_kolejka = high_resolution_clock::now();
-            SolveTSPBreadth(Matrix, bezpieczny_budzet); // <-- Przekazujemy budżet!
+            SolveTSPBreadth(Matrix,dummy_path, bezpieczny_budzet); // <-- Przekazujemy budżet!
             auto end_kolejka = high_resolution_clock::now();
             suma_czasow_kolejka += duration<double, milli>(end_kolejka - start_kolejka).count();
         }
@@ -192,12 +195,23 @@ int main()
                 cout << "Macierz jest pusta. Wczytaj dane z pliku " << endl;
                 break;
             }
+            vector<int> najlepsza_trasa;
             int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
             auto stary = high_resolution_clock::now();
-            int koszt = SolveTSP(macierz, bezpieczny_budzet);
+            int koszt = SolveTSP(macierz, najlepsza_trasa, bezpieczny_budzet);
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - stary;
             cout << "Najlepszy koszt trasy: " << koszt << endl;
+            cout << "Ciag wierzchołków: ";
+            if (!najlepsza_trasa.empty()) {
+                for (size_t i = 0; i < najlepsza_trasa.size(); ++i) {
+                    cout << najlepsza_trasa[i] << (i == najlepsza_trasa.size() - 1 ? "" : " -> ");
+                }
+            }
+            else {
+                cout << "Trasa optymalna znaleziona przez algorytm zachłanny (budżet startowy).";
+            }
+            cout << endl;
             cout << "Czas wykonania: " << czas.count() << " ms" << endl;
             break;
         }
@@ -209,15 +223,27 @@ int main()
             }
 
             cout << "\n[ Trwaja obliczenia - Breadth-First Search... ]\n";
+            vector<int> najlepsza_trasa;
             int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
             auto start = high_resolution_clock::now();
             // CZYSTE LICZENIE BEZ COUT'OW
-            int koszt = SolveTSPBreadth(macierz, bezpieczny_budzet);
+            int koszt = SolveTSPBreadth(macierz,najlepsza_trasa, bezpieczny_budzet);
 
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - start;
 
             cout << "Znalazlem najtansza trase! Koszt: " << koszt << "\n";
+            cout << "Ciag wierzchołków: ";
+            if (!najlepsza_trasa.empty()) {
+                // Jeśli B&B znalazło trasę lub potwierdziło trasę NN
+                for (size_t i = 0; i < najlepsza_trasa.size(); ++i) {
+                    cout << najlepsza_trasa[i] << (i == najlepsza_trasa.size() - 1 ? "" : " -> ");
+                }
+            }
+            else {
+                cout << "Trasa optymalna znaleziona przez algorytm zachłanny (budżet startowy).";
+            }
+            cout << endl;
             cout << "Czas dzialania algorytmu: " << czas.count() << " ms\n";
             break;
         }

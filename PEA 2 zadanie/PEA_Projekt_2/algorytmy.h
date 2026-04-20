@@ -114,8 +114,7 @@ public:
 };
 
 // 3. Główny algorytm: BRANCH AND BOUND (TSP)
-
-inline int SolveTSP(vector<vector<int>> initialization_matrix, int initial_upper_bound = INT_MAX) {
+inline int SolveTSP(vector<vector<int>> initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
     int n = initialization_matrix.size();
     MinHeap pq;
     // Tworzenie węzła początkowego
@@ -142,21 +141,27 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, int initial_upper
 
         Node curr = pq.pop();
 
-        // BOUND
+        // BOUND (Odcinanie gałęzi - klucz do szybkości B&B!)
         if (curr.lowerBound >= minTourCost) {
             continue;
         }
 
         int i = curr.city;
 
+        // Jeśli dotarliśmy do końca ścieżki (liść drzewa)
         if (curr.level == n - 1) {
             if (curr.lowerBound < minTourCost) {
                 minTourCost = curr.lowerBound;
+
+                // Zapisujemy przebieg najlepszej ścieżki
+                best_path = curr.path;
+                // Dodajemy powrót do miasta startowego (0), żeby cykl się zamknął
+                best_path.push_back(0);
             }
             continue;
         }
 
-        // BRANCH - Tego kodu Ci brakowało! Generowanie nowych tras
+        // BRANCH - Generowanie nowych tras
         for (int j = 0; j < n; j++) {
             if (curr.matrix[i][j] != -1) {
 
@@ -184,7 +189,6 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, int initial_upper
     }
     return minTourCost; // Funkcja w końcu zwraca wynik!
 }
-
 //kolejka FIFO
 class MyQueue {
 private:
@@ -206,7 +210,7 @@ public:
 
 // 4. Algorytm: BRANCH AND BOUND (Breadth-First Search - Przeszukiwanie Wszerz)
 
-inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, int initial_upper_bound = INT_MAX) {
+inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
     int n = initialization_matrix.size();
 
     // Używamy Twojej nowej kolejki FIFO zamiast Kopca!
@@ -236,16 +240,19 @@ inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, int initia
 
         Node curr = pq.pop();
 
-        // BOUND
+        // BOUND (Odcinanie gałęzi - klucz do szybkości B&B!)
         if (curr.lowerBound >= minTourCost) {
             continue;
         }
 
         int i = curr.city;
 
+        // Jeśli dotarliśmy do końca ścieżki (liść drzewa)
         if (curr.level == n - 1) {
             if (curr.lowerBound < minTourCost) {
                 minTourCost = curr.lowerBound;
+                best_path = curr.path;
+                best_path.push_back(0);
             }
             continue;
         }
