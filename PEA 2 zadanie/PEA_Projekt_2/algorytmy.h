@@ -3,8 +3,11 @@
 #include <iostream>
 #include <climits>
 #include <chrono>
+#include <list>
 
 using namespace std;
+using namespace std::chrono;
+
 
 struct Node {
     vector<vector<int>> matrix;
@@ -13,6 +16,41 @@ struct Node {
     int city;
     int level;
 };
+
+// Funkcja wyliczająca Ograniczenie Górne (Upper Bound) algorytmem zachłannym
+inline int ObliczPoczatkowyKoszt(const vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    int koszt = 0;
+    vector<bool> odwiedzone(n, false);
+    int obecne = 0;
+    odwiedzone[0] = true;
+
+    for (int krok = 0; krok < n - 1; ++krok) {
+        int najtansze = INT_MAX;
+        int nastepne = -1;
+        for (int i = 0; i < n; ++i) {
+            // Szukamy najtańszego nieodwiedzonego miasta
+            if (!odwiedzone[i] && matrix[obecne][i] != -1 && matrix[obecne][i] < najtansze) {
+                najtansze = matrix[obecne][i];
+                nastepne = i;
+            }
+        }
+
+        // Zabezpieczenie: jeśli z jakiegoś powodu algorytm zachłanny utknie w ślepym zaułku
+        if (nastepne == -1) return INT_MAX;
+
+        koszt += najtansze;
+        odwiedzone[nastepne] = true;
+        obecne = nastepne;
+    }
+
+    // Zabezpieczenie przed brakiem powrotu do startu
+    if (matrix[obecne][0] == -1) return INT_MAX;
+
+    koszt += matrix[obecne][0];
+    return koszt;
+}
+
 // funkcja redukująca macierz i zwracająca koszt redukcji
 inline int ReduceMatrix(vector<vector<int>>& matrix){
     int n = matrix.size();
@@ -113,10 +151,11 @@ public:
     }
 };
 
-// 3. Główny algorytm: BRANCH AND BOUND (TSP)
-inline int SolveTSP(vector<vector<int>> initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
+// 3. Główny algorytm: BRANCH AND BOUND (TSP) - KOPIEC
+inline int SolveTSP(const vector<vector<int>>& initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
     int n = initialization_matrix.size();
     MinHeap pq;
+
     // Tworzenie węzła początkowego
     Node root;
     root.matrix = initialization_matrix;
@@ -127,41 +166,42 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, vector<int>& best
 
     pq.push(root);
 
+    // WSTRZYKNIĘCIE BUDŻETU PRZED PĘTLĄ
     int minTourCost = initial_upper_bound;
+    if (minTourCost == INT_MAX) {
+        minTourCost = ObliczPoczatkowyKoszt(initialization_matrix);
+    }
 
-    auto start_time = chrono::high_resolution_clock::now(); //uruchamiamy stoper 
+    auto start_time = high_resolution_clock::now();
     // Główna pętla
     while (!pq.isEmpty()) {
 
-        auto current_time = chrono::high_resolution_clock::now();
-        if (chrono::duration_cast<chrono::seconds>(current_time - start_time).count() > 300) {
+        auto current_time = high_resolution_clock::now();
+        if (duration_cast<seconds>(current_time - start_time).count() > 300) {
             cout << "\nPrzekroczono limit 5 minut!.\n";
             return minTourCost;
         }
 
         Node curr = pq.pop();
 
-        // BOUND (Odcinanie gałęzi - klucz do szybkości B&B!)
+        // BOUND 
         if (curr.lowerBound >= minTourCost) {
             continue;
         }
 
         int i = curr.city;
 
-        // Jeśli dotarliśmy do końca ścieżki (liść drzewa)
+        // Jeśli dotarliśmy do końca ścieżki
         if (curr.level == n - 1) {
             if (curr.lowerBound < minTourCost) {
                 minTourCost = curr.lowerBound;
-
-                // Zapisujemy przebieg najlepszej ścieżki
                 best_path = curr.path;
-                // Dodajemy powrót do miasta startowego (0), żeby cykl się zamknął
                 best_path.push_back(0);
             }
             continue;
         }
 
-        // BRANCH - Generowanie nowych tras
+        // BRANCH 
         for (int j = 0; j < n; j++) {
             if (curr.matrix[i][j] != -1) {
 
@@ -183,24 +223,27 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, vector<int>& best
 
                 child.lowerBound = curr.lowerBound + costOfEdge + reducedCost;
 
-                pq.push(child);
+                // WCZESNE ODCINANIE I PUSH
+                if (child.lowerBound < minTourCost) {
+                    pq.push(child);
+                }
             }
         }
     }
-    return minTourCost; // Funkcja w końcu zwraca wynik!
+    return minTourCost;
 }
 //kolejka FIFO
 class MyQueue {
 private:
-	vector<Node> q;
+	list<Node> q;
 public:
     void push(Node node) {
 		q.push_back(node); // dodajemy element na koniec kolejki
     }
     Node pop() {
-        Node firstNode = q[0];
-		q.erase(q.begin()); // usuwamy pierwszy element z kolejki
-		return firstNode;        
+        Node obecny = q.front();
+        q.pop_front();
+        return obecny;
     }
     bool isEmpty() const {
         return q.empty();
@@ -210,7 +253,7 @@ public:
 
 // 4. Algorytm: BRANCH AND BOUND (Breadth-First Search - Przeszukiwanie Wszerz)
 
-inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
+inline int SolveTSPBreadth(const vector<vector<int>>& initialization_matrix, vector<int>& best_path, int initial_upper_bound = INT_MAX) {
     int n = initialization_matrix.size();
 
     // Używamy Twojej nowej kolejki FIFO zamiast Kopca!
@@ -218,6 +261,11 @@ inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, vector<int
 
     // Tworzenie węzła początkowego
     Node root;
+    int minTourCost = initial_upper_bound;
+    if (minTourCost == INT_MAX) {
+        // Obliczamy pierwszy budżet algorytmem zachłannym
+        minTourCost = ObliczPoczatkowyKoszt(initialization_matrix);
+    }
     root.matrix = initialization_matrix;
     root.path.push_back(0);
     root.city = 0;
@@ -226,14 +274,12 @@ inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, vector<int
 
     pq.push(root);
 
-    int minTourCost = initial_upper_bound;
-
     // Główna pętla
-    auto start_time = chrono::high_resolution_clock::now();
+    auto start_time = high_resolution_clock::now();
     while (!pq.isEmpty()) {
 
-        auto current_time = chrono::high_resolution_clock::now();
-        if (chrono::duration_cast<chrono::seconds>(current_time - start_time).count() > 300) {
+        auto current_time =high_resolution_clock::now();
+        if (duration_cast<seconds>(current_time - start_time).count() > 300) {
             cout << "\n[TIMEOUT] Przekroczono limit 5 minut! Przerwano obliczenia.\n";
             return minTourCost;
         }
@@ -279,7 +325,9 @@ inline int SolveTSPBreadth(vector<vector<int>> initialization_matrix, vector<int
 
                 child.lowerBound = curr.lowerBound + costOfEdge + reducedCost;
 
-                pq.push(child);
+                if (child.lowerBound < minTourCost) {
+                    pq.push(child);
+                }
             }
         }
     }
