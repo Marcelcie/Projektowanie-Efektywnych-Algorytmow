@@ -5,3 +5,15 @@ N;Metoda;Sredni_Czas_ms
 14;Breadth-First(Kolejka);0
 15;Best-First(Kopiec);13.0582
 15;Breadth-First(Kolejka);0
+12;Best-First(Kopiec);2.15392
+12;Breadth-First(Kolejka);0
+13;Best-First(Kopiec);4.25642
+13;Breadth-First(Kolejka);0
+14;Best-First(Kopiec);5.77059
+14;Breadth-First(Kolejka);0
+15;Best-First(Kopiec);9.08144
+15;Breadth-First(Kolejka);0
+16;Best-First(Kopiec);15.28
+16;Breadth-First(Kolejka);0
+17;Best-First(Kopiec);24.5277
+17;Breadth-First(Kolejka);0

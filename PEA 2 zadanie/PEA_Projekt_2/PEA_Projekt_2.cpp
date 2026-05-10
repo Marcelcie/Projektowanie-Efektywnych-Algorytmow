@@ -74,7 +74,7 @@ void Generate_Matrix(int rozmiar_macierzy) {
             }
         }
     }
-	cout << "Wygenerowano macierz o rozmiarze:" << N << "x" << N << "." << endl;
+	cout << "Wygenerowano macierz o rozmiarze: " << N << "x" << N << "." << endl;
 }
 // Szybki algorytm zachłanny, żeby dać nam "dobry" początkowy budżet
 int ObliczPoczatkowyKoszt() {
@@ -202,14 +202,14 @@ int main()
             auto end = high_resolution_clock::now();
             duration<double, milli> czas = end - stary;
             cout << "Najlepszy koszt trasy: " << koszt << endl;
-            cout << "Ciag wierzchołków: ";
+            cout << "Ciag wierzcholkow: ";
             if (!najlepsza_trasa.empty()) {
                 for (size_t i = 0; i < najlepsza_trasa.size(); ++i) {
                     cout << najlepsza_trasa[i] << (i == najlepsza_trasa.size() - 1 ? "" : " -> ");
                 }
             }
             else {
-                cout << "Trasa optymalna znaleziona przez algorytm zachłanny (budżet startowy).";
+                cout << "Trasa optymalna znaleziona przez algorytm zachlanny (budzet startowy).";
             }
             cout << endl;
             cout << "Czas wykonania: " << czas.count() << " ms" << endl;
@@ -233,7 +233,7 @@ int main()
             duration<double, milli> czas = end - start;
 
             cout << "Znalazlem najtansza trase! Koszt: " << koszt << "\n";
-            cout << "Ciag wierzchołków: ";
+            cout << "Ciag wierzcholkow: ";
             if (!najlepsza_trasa.empty()) {
                 // Jeśli B&B znalazło trasę lub potwierdziło trasę NN
                 for (size_t i = 0; i < najlepsza_trasa.size(); ++i) {
@@ -241,7 +241,7 @@ int main()
                 }
             }
             else {
-                cout << "Trasa optymalna znaleziona przez algorytm zachłanny (budżet startowy).";
+                cout << "Trasa optymalna znaleziona przez algorytm zachlanny (budzet startowy).";
             }
             cout << endl;
             cout << "Czas dzialania algorytmu: " << czas.count() << " ms\n";

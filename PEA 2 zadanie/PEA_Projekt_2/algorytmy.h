@@ -190,6 +190,7 @@ inline int SolveTSP(vector<vector<int>> initialization_matrix, vector<int>& best
     return minTourCost; // Funkcja w końcu zwraca wynik!
 }
 //kolejka FIFO
+// erase ,powinna być na liście
 class MyQueue {
 private:
 	vector<Node> q;
