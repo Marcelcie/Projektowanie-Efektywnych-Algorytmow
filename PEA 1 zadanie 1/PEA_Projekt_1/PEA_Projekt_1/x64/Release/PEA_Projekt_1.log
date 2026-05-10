@@ -1,8 +1,0 @@
-﻿  PEA_Projekt_1.cpp
-C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(156,19): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
-C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\PEA_Projekt_1.cpp(235,19): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
-  Trwa generowanie kodu
-  Previous IPDB was built with incompatible compiler, fall back to full compilation.
-  All 218 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Zakończono generowanie kodu
-  PEA_Projekt_1.vcxproj -> C:\Users\ciesl\source\repos\PEA 1\PEA 1 zadanie 1\PEA_Projekt_1\x64\Release\PEA_Projekt_1.exe
