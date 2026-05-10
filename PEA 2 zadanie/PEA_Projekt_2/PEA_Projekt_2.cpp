@@ -76,29 +76,6 @@ void Generate_Matrix(int rozmiar_macierzy) {
     }
 	cout << "Wygenerowano macierz o rozmiarze: " << N << "x" << N << "." << endl;
 }
-// Szybki algorytm zachłanny, żeby dać nam "dobry" początkowy budżet
-int ObliczPoczatkowyKoszt() {
-    int koszt = 0;
-    vector<bool> odwiedzone(N, false);
-    int obecne = 0;
-    odwiedzone[0] = true;
-
-    for (int krok = 0; krok < N - 1; ++krok) {
-        int najtansze = INT_MAX;
-        int nastepne = -1;
-        for (int i = 0; i < N; ++i) {
-            if (!odwiedzone[i] && Matrix[obecne][i] != -1 && Matrix[obecne][i] < najtansze) {
-                najtansze = Matrix[obecne][i];
-                nastepne = i;
-            }
-        }
-        koszt += najtansze;
-        odwiedzone[nastepne] = true;
-        obecne = nastepne;
-    }
-    koszt += Matrix[obecne][0]; // powrót do startu
-    return koszt;
-}
 void Automat_BB(int poczatkowe_N, int koncowe_N, int ilosc_prob) {
     ofstream plik("wyniki_bb.csv", ios::app);
     if (!plik.is_open()) {
@@ -125,7 +102,7 @@ void Automat_BB(int poczatkowe_N, int koncowe_N, int ilosc_prob) {
             vector<int> dummy_path;
 
             // --- NOWE: LICZYMY BUDZET STARTOWY ---
-            int bezpieczny_budzet = ObliczPoczatkowyKoszt();
+            int bezpieczny_budzet = ObliczPoczatkowyKoszt(Matrix);
 
             // --- TEST BEST-FIRST (Kopiec) ---
             auto start_kopiec = high_resolution_clock::now();
@@ -196,7 +173,7 @@ int main()
                 break;
             }
             vector<int> najlepsza_trasa;
-            int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
+            int bezpieczny_budzet = ObliczPoczatkowyKoszt(macierz);
             auto stary = high_resolution_clock::now();
             int koszt = SolveTSP(macierz, najlepsza_trasa, bezpieczny_budzet);
             auto end = high_resolution_clock::now();
@@ -224,7 +201,7 @@ int main()
 
             cout << "\n[ Trwaja obliczenia - Breadth-First Search... ]\n";
             vector<int> najlepsza_trasa;
-            int bezpieczny_budzet = problem.ObliczPoczatkowyKoszt();
+            int bezpieczny_budzet = ObliczPoczatkowyKoszt(macierz);
             auto start = high_resolution_clock::now();
             // CZYSTE LICZENIE BEZ COUT'OW
             int koszt = SolveTSPBreadth(macierz,najlepsza_trasa, bezpieczny_budzet);
