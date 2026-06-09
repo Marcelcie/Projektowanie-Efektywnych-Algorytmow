@@ -302,7 +302,7 @@ public:
             bladSredni = ((sredniKosztOstatniej - optymalnyKoszt) / optymalnyKoszt) * 100.0;
         }
 
-        // WYSWIETLENIE WYNIKOW (Zgodnie z uwagami z PDF)
+        // WYSWIETLENIE WYNIKOW
         cout << "\n================ WYNIKI ALGORYTMU ================" << endl;
         cout << "Przeanalizowano pokolen: " << iteracja << endl;
         cout << "Najlepsze znalezione rozwiazanie (koszt): " << najlepszyGlobalnie.fitness << endl;
