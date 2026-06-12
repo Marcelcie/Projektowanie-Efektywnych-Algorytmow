@@ -20,6 +20,13 @@ Celem projektów była implementacja różnych podejść algorytmicznych, zbadan
   Implementacja metaheurystyki inspirowanej procesem chłodzenia w metalurgii:
   * Algorytm Symulowanego Wyżarzania (Simulated Annealing)
   * Badanie wpływu parametrów chłodzenia i trasy startowej na ostateczny wynik.
+ 
+* **PEA Zadanie 4 - Algorytm Genetyczny**
+  Implementacja heurystycznego algorytmu ewolucyjnego opartego na populacji rozwiązań permutacyjnych dla problemu ATSP:
+  * Selekcja: Turniejowa (z domyślnym rozmiarem turnieju równym 3)
+  * Krzyżowanie: Order Crossover (OX) zachowujące prawidłową kolejność miast
+  * Mutacja: Dwa alternatywne warianty zaburzenia chromosomu – Mutacja Zamiany (Swap) oraz Mutacja Inwersji (Inversion)
+  * Kryterium stopu: Elastyczny limit czasowy działania wyrażony w sekundach
 
 ## 🛠️ Technologie
 * **Język:** C++ (Standard C++11/14+)
