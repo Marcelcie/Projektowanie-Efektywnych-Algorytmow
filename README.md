@@ -6,15 +6,17 @@ Celem projektów była implementacja różnych podejść algorytmicznych, zbadan
 
 ## 📂 Zawartość repozytorium
 
-* **PEA Zadanie 1 - Algorytmy Dokładne**
-  Implementacja algorytmów gwarantujących znalezienie optymalnego rozwiązania:
-  * Przegląd zupełny (Brute Force)
-  * Metoda podziału i ograniczeń (Branch and Bound)
+* **PEA Projekt 1 - Algorytmy Zachłanne i Przegląd Zupełny**
+  Implementacja podstawowych podejść dokładnych oraz heurystyk startowych weryfikująca różnice w czasie i błędzie względnym:
+  * Przegląd zupełny (Brute Force - BF)
+  * Algorytm zachłanny (Nearest Neighbor - NN)
+  * Rozszerzony algorytm zachłanny (Repetitive Nearest Neighbor - RNN)
+  * Przeszukiwanie losowe (Random Search - RS)
   
-* **PEA Zadanie 2 - Heurystyki i Przeszukiwanie z Zakazami**
-  Zastosowanie metod przybliżonych do szybszego znajdowania suboptymalnych tras:
-  * Algorytm zachłanny (Nearest Neighbor)
-  * Metaheurystyka Tabu Search (z uwzględnieniem listy zakazów i aspiracji)
+* **PEA Projekt 2 - Metoda Podziału i Ograniczeń (Branch and Bound)**
+  Implementacja algorytmu dokładnego optymalizującego przeszukiwanie drzewa stanów z wykorzystaniem dynamicznie wyliczanego budżetu startowego:
+  * Strategia Best-First Search (z wykorzystaniem kolejki priorytetowej / kopca)
+  * Strategia Breadth-First Search (z wykorzystaniem kolejki FIFO)
 
 * **PEA Zadanie 3 - Symulowane Wyżarzanie**
   Implementacja metaheurystyki inspirowanej procesem chłodzenia w metalurgii:
