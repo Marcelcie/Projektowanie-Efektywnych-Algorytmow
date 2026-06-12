@@ -150,7 +150,7 @@ public:
 
         if (punkt1 > punkt2) swap(punkt1, punkt2);
 
-        // 1. Przepisujemy wycinek od pierwszego rodzica
+        // 1. Przepisujemy od pierwszego rodzica
         for (int i = punkt1; i <= punkt2; ++i) {
             dziecko.trasa[i] = rodzic1.trasa[i];
         }
@@ -353,7 +353,7 @@ int main() {
             if (ga.wczytajZPliku(plik)) {
                 cout << "[OK] Dane zaladowane!" << endl;
                 ga.wyswietlDane();
-                // Automatyczne podpowiedzi optimum dla ulatwienia testow studenta
+                // Automatyczne wstawianie optimum
                 if (plik.find("ftv170") != string::npos) znaneOptimum = 2755;
                 else if (plik.find("ft53") != string::npos) znaneOptimum = 6905;
                 else {
